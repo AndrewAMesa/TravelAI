@@ -1,5 +1,6 @@
 from LLaMaTravelAI import  *
 from postgresConnection import *
+import getpass
 
 def run_trip_planner(description):
     print(f"Generating trip plan for: {description}\n")
@@ -37,12 +38,27 @@ def main():
     choice = input("Would you like to login (1) or create a new user (2)?\n")
     if choice == "1":
         username = input("Username: ")
-        password = input("Password: ")
+        password = getpass.getpass("Password: ")
         loggedUser = checkLogin(username=username, password=password)
         if loggedUser is None:
             exit()
         else:
             print(f"Welcome, {loggedUser}")
+    elif choice == "2":
+        username = input("Please Enter Username: ")
+        password = getpass.getpass("Please Choose a Password: ")
+        redo_pass = getpass.getpass("Please Confirm Password: ")
+        while redo_pass != password:
+            password = getpass.getpass("Passwords Do Not Match, Please Try Again: ")  
+            redo_pass = getpass.getpass("Please Confirm Password: ")
+        loggedUser = createUser(username=username, password=password)
+        if loggedUser is None:
+            exit()
+        else: 
+            print(f"Welcome, {loggedUser}")
+    else:
+        print("Invalid choice. Please try again.")
+        exit()
 
 
     while True:

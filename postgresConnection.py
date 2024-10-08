@@ -91,3 +91,53 @@ def checkLogin(username, password):
 
     except Exception:
         print(f"Username or Password Incorrect")
+
+#create login by posting user information
+def createUser(username, password):
+    try:
+        #connect to db
+        conn = psycopg2.connect(**conn_params)
+        cursor = conn.cursor()
+        #define sql query
+        query = "SELECT * FROM loginInfo WHERE login = %s"
+        #execute query
+        cursor.execute(query, (username,))
+        #fetch result
+        result = cursor.fetchone()
+        #close cursor and connection
+        cursor.close()
+        conn.close()
+
+        if result:
+            raise Exception
+    except Exception:
+        print(f"User Already Exists")
+        return None
+
+    try:
+        #connect to db
+        conn = psycopg2.connect(**conn_params)
+        cursor = conn.cursor()
+
+        #define sql query to insert data
+        query = """
+            INSERT INTO loginInfo (login, password)
+            VALUES (%s, %s)
+        """
+        #execute query
+        cursor.execute(query, (username, password))
+
+        #commit transaction 
+        conn.commit()
+
+        #close cursor & connection
+        cursor.close()
+        conn.close()
+
+        print("New User Successfully Created")
+        return username
+
+    except Exception as e:
+        print(f"Error creating new user, please try again: {e}")
+        return None
+
