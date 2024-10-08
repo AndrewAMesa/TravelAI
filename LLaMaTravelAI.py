@@ -6,8 +6,12 @@ from ast import literal_eval
 import pandas as pd
 import numpy as np
 import re
+import os
+from dotenv import load_dotenv
 
-hf_token = "________________"
+load_dotenv()
+
+hf_token = os.getenv("API_KEY")
 
 # Hugging Face API setup for LLM
 repo_id = "meta-llama/Meta-Llama-3-70B-Instruct"
