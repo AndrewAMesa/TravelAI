@@ -1,4 +1,5 @@
 from LLaMaTravelAI import  *
+from postgresConnection import *
 
 def run_trip_planner(description):
     print(f"Generating trip plan for: {description}\n")
@@ -33,6 +34,17 @@ def run_trip_planner(description):
 # Example command-line interface loop
 def main():
     print("Welcome to the AI Trip Planner!")
+    choice = input("Would you like to login (1) or create a new user (2)?\n")
+    if choice == "1":
+        username = input("Username: ")
+        password = input("Password: ")
+        loggedUser = checkLogin(username=username, password=password)
+        if loggedUser is None:
+            exit()
+        else:
+            print(f"Welcome, {loggedUser}")
+
+
     while True:
         print("\nEnter a trip description (or type 'exit' to quit):")
         description = input("> ").strip()

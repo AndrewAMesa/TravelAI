@@ -62,4 +62,32 @@ def postHistory(user_login, title_message, ai_response):
 
     except Exception as e:
         print(f"Error posting to chat history: {e}")
+        return None
 
+#function to check if the given username and password are correct.
+def checkLogin(username, password):
+    try:
+        #connect to db
+        conn = psycopg2.connect(**conn_params)
+        cursor = conn.cursor()
+
+        #define sql query
+        query = "SELECT * FROM loginInfo WHERE login = %s AND password = %s"
+
+        #execute query
+        cursor.execute(query, (username, password))
+
+        #fetch result
+        result = cursor.fetchone()
+
+        #close cursor and connection
+        cursor.close()
+        conn.close()
+
+        if result:
+            return username
+        else: 
+            raise Exception
+
+    except Exception:
+        print(f"Username or Password Incorrect")
