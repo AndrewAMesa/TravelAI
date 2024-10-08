@@ -11,17 +11,17 @@ conn_params = {
 }
 
 # a function to get the chat history from the database
-def fetchHistory():
+def fetchHistory(username):
     try:
         #connect to db
         conn = psycopg2.connect(**conn_params)
         cursor = conn.cursor()
 
         #define sql query
-        query = "SELECT * FROM chatHistory ORDER BY timestamp DESC"
+        query = "SELECT * FROM chatHistory WHERE login = %s ORDER BY timestamp DESC"
 
         #execute query
-        cursor.execute(query)
+        cursor.execute(query, (username,))
 
         #fetch all results
         chat_history = cursor.fetchall()
