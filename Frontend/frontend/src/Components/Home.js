@@ -5,29 +5,50 @@ import TopBar from './TopBar';
 import itineraryIcon from '../Images/itinerary.png'
 import flightIcon from '../Images/plane.png'
 import lodgingIcon from '../Images/hotel.png'
-import run_trip_planner from MainAPP.py
 
 const Home = () => {
     const [messages, setMessages] = useState([]); //for messages
     const [input, setInput] = useState(''); //for user input
+    const [loggedUser, setLoggedUser] = useState('YourUsername');
 
     //function for user input
-    const handleSendMessage = () => {
+    const handleSendMessage = async () => {
       if (input.trim() !== '') {
-        //adds users input
-        setMessages([...messages, {type: 'user', content: input}]);
+        // Add user input
+        setMessages([...messages, { type: 'user', content: input }]);
         setInput('');
 
-        //Simulated AI response
-        {/* put run_trip_planner(loggedUser, description) call here for 'content' */}
-        setTimeout(() => {
+        // Call the Flask API
+        try {
+          const response = await fetch('http://127.0.0.1:5000/run_trip_planner', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ loggedUser, description: input }),
+          });
+
+          const data = await response.json();
+          if (response.ok) {
+            // Simulated AI response
+            setMessages((prevMessages) => [
+              ...prevMessages,
+              { type: 'ai', content: data.plan },
+            ]);
+          } else {
+            setMessages((prevMessages) => [
+              ...prevMessages,
+              { type: 'ai', content: data.error },
+            ]);
+          }
+        } catch (error) {
           setMessages((prevMessages) => [
             ...prevMessages,
-            {type: 'ai', content: 'This is a simulated AI response.'}
+            { type: 'ai', content: 'Error communicating with the server.' },
           ]);
-        }, 1000);
-      }
-    };
+        }
+    }
+};
 
     return (
         <div className="h-screen flex flex-col">
