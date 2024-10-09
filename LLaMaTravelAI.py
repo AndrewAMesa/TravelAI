@@ -2,9 +2,11 @@ import asyncio
 from huggingface_hub import InferenceClient
 from geopy.geocoders import Nominatim
 from geopy.adapters import AioHTTPAdapter
+from geopy.exc import GeocoderQuotaExceeded
 from ast import literal_eval
 import pandas as pd
 import numpy as np
+import time
 import re
 import os
 from dotenv import load_dotenv
@@ -20,15 +22,18 @@ llm_client = InferenceClient(model=repo_id, timeout=180, token=hf_token)
 # Function to generate key points using the LLM
 def generate_key_points(text):
     prompt = f"""             
-Please generate a set of key geographical points for the following description: {text}, as a json list of less than 10 dictionaries with the following keys: 'name', 'description'.
-ALWAYS precise the city and country in the 'name'. For instance do not only "name": "Notre Dame" as the name but "name": "Notre Dame, Paris, France".
-Generally try to minimize the distance between locations. Always think of the transportation means that you want to use, and the timing: morning, afternoon, where to sleep.
-Only generate two sections: 'Thought:' provides your rationale for generating the points, then you list the locations in 'Key points:'.
-Then generate 'I hope that helps!' to indicate the end of the response.
-Now begin.
-Description: {text}
-Thought:"""
-    return llm_client.text_generation(prompt, max_new_tokens=2000, stream=True, stop_sequences=["I hope that helps!"])
+    Generate a set of key geographical points for the following description: {text}, as a json list with the number dictionaries matching the number of requested days, if
+    no time is suggested make one make a dictionary with less then 10. Dictionary must include the following keys: 'name', 'description'.
+    ALWAYS precise the city and country in the 'name'. For instance do not only "name": "Notre Dame" as the name but "name": "Notre Dame, Paris, France".
+    Also, provide enough activities to fill **each day** of the trip, ensuring that there are distinct points for each day, such that every day of the trip is planned out.
+    Consider the trip timing (morning, afternoon, evening) and whether the locations are accessible during the season specified.
+    Only generate two sections: 'Thought:' provides your rationale for generating the points, then you list the locations in 'Key points:'. Then generate 'I hope that helps!' 
+    to indicate the end of the response.
+    Now begin.
+    Description: {text}
+    Thought:"""
+
+    return llm_client.text_generation(prompt, max_new_tokens=5000, stream=True, stop_sequences=["I hope that helps!"])
 
 
 # Function to parse the output from the LLM
@@ -52,18 +57,37 @@ async def geocode_address(address):
 
 # Updated function to ensure the event loop and client sessions are handled properly
 async def ageocode_addresses(addresses):
+    locations = []
     async with Nominatim(user_agent="HF-trip-planner", adapter_factory=AioHTTPAdapter) as geolocator:
-        tasks = [geolocator.geocode(address, timeout=10) for address in addresses]
-        locations = await asyncio.gather(*tasks)
-        return [{'lat': loc.latitude, 'lon': loc.longitude} if loc else None for loc in locations]
+        for address in addresses:
+            try:
+                location = await geolocator.geocode(address, timeout=10)
+                if location:
+                    locations.append({'lat': location.latitude, 'lon': location.longitude})
+                else:
+                    locations.append(None)
+            except GeocoderQuotaExceeded as e:
+                print(f"Rate limit reached. Retrying in 2 minutes...")
+                time.sleep(120)  # Wait for 2 minutes and try again
+                location = await geolocator.geocode(address, timeout=10)
+                if location:
+                    locations.append({'lat': location.latitude, 'lon': location.longitude})
+                else:
+                    locations.append(None)
+    return locations
 
 def geocode_addresses(addresses):
     return asyncio.run(ageocode_addresses(addresses))
 
 def extract_num_days_from_prompt(description):
-    match = re.search(r'(\d+)\s*(day|days)', description.lower())
+    match = re.search(r'(\d+)\s*(day|days|week|weeks)', description.lower())
     if match:
-        return int(match.group(1))
+        number = int(match.group(1))
+        unit = match.group(2)
+        if 'day' in unit:
+            return number
+        elif 'week' in unit or 'weekly' in unit:
+            return number * 7
     else:
         while True:
             try:
