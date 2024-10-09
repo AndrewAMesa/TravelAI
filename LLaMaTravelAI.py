@@ -33,7 +33,7 @@ def generate_key_points(text):
     Description: {text}
     Thought:"""
 
-    return llm_client.text_generation(prompt, max_new_tokens=3000, stream=True, stop_sequences=["I hope that helps!"])
+    return llm_client.text_generation(prompt, max_new_tokens=5000, stream=True, stop_sequences=["I hope that helps!"])
 
 
 # Function to parse the output from the LLM
