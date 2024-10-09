@@ -12,19 +12,19 @@ const Home = () => {
           {/* Top Bar */}
           <TopBar />
     
-          <div className="flex flex-1">
+          <div className="flex flex-1 overflow-hidden">
             {/* Sidebar Section */}
             <div className="w-1/4 bg-[#563635] text-white p-5">
               <Sidebar />
             </div>
     
             {/* Main Content Section */}
-            <div className="w-3/4 flex flex-col p-5 bg-[#fad4c0]">
+            <div className="w-3/4 flex flex-col bg-[#fad4c0] h-full">
               {/* Action Buttons Section */}
-              <div className="grid grid-cols-3 ml-32 mb-1 mt-24">
-                <ActionButton label="Find Flights" icon={flightIcon} />
-                <ActionButton label="Find Lodging" icon={lodgingIcon} />
-                <ActionButton label="Itinerary Planning" icon={itineraryIcon} />
+              <div className="grid grid-cols-3 ml-32 mb-1 mt-24 font-josefin">
+                <ActionButton label= {"Find \nFlights"} icon={flightIcon} />
+                <ActionButton label= {"Find \nLodging"} icon={lodgingIcon} />
+                <ActionButton label= {"Itinerary \nPlanning"} icon={itineraryIcon} />
               </div>
     
               {/* Search Bar Section (placed at the bottom) */}
@@ -32,7 +32,7 @@ const Home = () => {
                 <input
                   type="text"
                   placeholder="Search for flights, lodging, or destinations..."
-                  className="p-3 border border-gray-300 rounded-md w-full"
+                  className="p-3 bg-[#fadbca] w-full shadow-2xl shadow-black font-josefin text-[#563635] placeholder:text-[#563635] placeholder:text-opacity-60"
                 />
               </div>
             </div>

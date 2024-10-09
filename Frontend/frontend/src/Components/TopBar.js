@@ -52,7 +52,7 @@ const TopBar = () => {
 
 
   return (
-    <div className="w-full h-16 bg-[#563635] flex items-center justify-between px-4 text-white">
+    <div className="w-full h-16 bg-[#563635] flex items-center justify-between px-4 text-white drop-shadow-md">
       <h1 className="text-xl font-bold">AI Travel Assistant</h1>
       <div className="flex items-center space-x-4">
         <Icon icon="iconamoon:profile-circle-fill" onClick={toggleLoginPopup} className="w-12 h-12 hover:text-[#4e2c20] transition duration-200 cursor-pointer"/>
