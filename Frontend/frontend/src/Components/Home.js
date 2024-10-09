@@ -22,9 +22,9 @@ const Home = () => {
             <div className="w-3/4 flex flex-col bg-[#fad4c0] h-full">
               {/* Action Buttons Section */}
               <div className="grid grid-cols-3 ml-32 mb-1 mt-24 font-josefin">
-                <ActionButton label="Find Flights" icon={flightIcon} />
-                <ActionButton label="Find Lodging" icon={lodgingIcon} />
-                <ActionButton label="Itinerary Planning" icon={itineraryIcon} />
+                <ActionButton label= {"Find \nFlights"} icon={flightIcon} />
+                <ActionButton label= {"Find \nLodging"} icon={lodgingIcon} />
+                <ActionButton label= {"Itinerary \nPlanning"} icon={itineraryIcon} />
               </div>
     
               {/* Search Bar Section (placed at the bottom) */}
@@ -32,7 +32,7 @@ const Home = () => {
                 <input
                   type="text"
                   placeholder="Search for flights, lodging, or destinations..."
-                  className="p-3 bg-[#fadbca] w-full shadow-2xl shadow-black font-josefin text-[#563635]"
+                  className="p-3 bg-[#fadbca] w-full shadow-2xl shadow-black font-josefin text-[#563635] placeholder:text-[#563635] placeholder:text-opacity-60"
                 />
               </div>
             </div>
