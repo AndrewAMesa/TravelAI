@@ -32,7 +32,7 @@ const Home = () => {
                 <input
                   type="text"
                   placeholder="Search for flights, lodging, or destinations..."
-                  className="p-3 bg-[#fad4c0] w-full shadow-2xl shadow-black font-josefin text-red"
+                  className="p-3 bg-[#fadbca] w-full shadow-2xl shadow-black font-josefin text-[#563635]"
                 />
               </div>
             </div>
