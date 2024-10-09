@@ -3,7 +3,7 @@ from postgresConnection import *
 import getpass
 from PhiLocalAI import *
 
-def run_trip_planner(description):
+def run_trip_planner(loggedUser, description):
     print(f"Generating trip plan for: {description}\n")
 
     try:
@@ -11,6 +11,7 @@ def run_trip_planner(description):
         current_output = ""
         for output in generate_key_points(description):
             current_output += output
+
         print("Generated key points using API")
     except Exception as e:
         # If the API fails, fallback to the local model
@@ -38,13 +39,17 @@ def run_trip_planner(description):
     # Split the trip into days
     days = split_trip_into_days(dataframe, num_days)
 
+    plan = ""
     # Display the trip plan, split by days
     for day, activities in days.items():
         print(f"\n{day}:\n")
+        plan += f"\n{day}:\n"
         for _, row in activities.iterrows():
             print(
                 f"Location: {row['name']}\nDescription: {row['description']}\nCoordinates: ({row['lat']}, {row['lon']})\n")
+            plan += f"Location: {row['name']}\nDescription: {row['description']}\nCoordinates: ({row['lat']}, {row['lon']})\n"
 
+    postHistory(user_login=loggedUser, title_message=description, ai_response=plan)
 
 # Example command-line interface loop
 def main():
@@ -58,6 +63,19 @@ def main():
             exit()
         else:
             print(f"Welcome, {loggedUser}")
+
+        disp_history = input("Would you like to view your previous chat history?\nYes(y) or No(n)?\n")
+        if disp_history == "y":
+            history = fetchHistory(loggedUser)
+            if history:
+                for entry in history:
+                    print(f"{entry['title']}")
+                    print(f"{entry['response']}")
+                    print(f"{entry['timestamp']}\n")
+            else:
+                print("No current chat history.")
+        else:
+            pass
     elif choice == "2":
         username = input("Please Enter Username: ")
         password = getpass.getpass("Please Choose a Password: ")
@@ -81,7 +99,7 @@ def main():
         if description.lower() == "exit":
             print("\n Hope you have a good trip!")
             break
-        run_trip_planner(description)
+        run_trip_planner(loggedUser=loggedUser, description=description)
 
 
 if __name__ == "__main__":

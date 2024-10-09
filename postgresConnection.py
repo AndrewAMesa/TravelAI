@@ -30,6 +30,24 @@ def fetchHistory(username):
         cursor.close()
         conn.close()
 
+        if chat_history:
+            # Format the fetched data
+            formatted_history = []
+            for record in chat_history:
+                login, title, response, timestamp = record
+
+                # Format the timestamp
+                formatted_timestamp = timestamp.strftime("%d/%m/%Y %H:%M")
+
+                # Append formatted entry to list
+                formatted_history.append({
+                    'title': title,
+                    'response': response,
+                    'timestamp': formatted_timestamp
+                })
+
+            return formatted_history
+
         print("Chat history successfully fetched")
         return chat_history
 
