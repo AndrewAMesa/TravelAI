@@ -1,4 +1,4 @@
-#from llama_cpp import Llama
+from llama_cpp import Llama
 
 # Define a function that uses the local model to generate trip planning suggestions
 def get_trip_planning_suggestions(text):
