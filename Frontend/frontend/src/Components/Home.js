@@ -1,7 +1,10 @@
 import React from 'react';
 import ActionButton from './ActionButton';
-import Sidebar from './Sidebar'
+import Sidebar from './Sidebar';
 import TopBar from './TopBar';
+import itineraryIcon from '../Images/itinerary.png'
+import flightIcon from '../Images/plane.png'
+import lodgingIcon from '../Images/hotel.png'
 
 const Home = () => {
     return (
@@ -18,10 +21,10 @@ const Home = () => {
             {/* Main Content Section */}
             <div className="w-3/4 flex flex-col p-5 bg-[#fad4c0]">
               {/* Action Buttons Section */}
-              <div className="grid grid-cols-3 gap-14 mb-8 mt-48">
-                <ActionButton label="Find Flights" icon="flight" />
-                <ActionButton label="Find Lodging" icon="hotel" />
-                <ActionButton label="Itinerary Planning" icon="planning" />
+              <div className="grid grid-cols-3 ml-32 mb-1 mt-24">
+                <ActionButton label="Find Flights" icon={flightIcon} />
+                <ActionButton label="Find Lodging" icon={lodgingIcon} />
+                <ActionButton label="Itinerary Planning" icon={itineraryIcon} />
               </div>
     
               {/* Search Bar Section (placed at the bottom) */}
