@@ -6,8 +6,8 @@ import os
 from dotenv import load_dotenv
 
 load_dotenv()
-flight_id = os.getenv("FLIGHT_KEY")
-flight_secret = os.getenv("FLIGHT_SECRET")
+hotel_id = os.getenv("FLIGHT_KEY")
+hotel_secret = os.getenv("FLIGHT_SECRET")
 
 # Function to parse LLM output for hotels
 def parse_llm_output_lodging(output):
@@ -25,15 +25,14 @@ def get_access_token():
     headers = {"Content-Type": "application/x-www-form-urlencoded"}
     data = {
         "grant_type": "client_credentials",
-        "client_id": flight_id,
-        "client_secret": flight_secret
+        "client_id": hotel_id,
+        "client_secret": hotel_secret
     }
 
     response = requests.post(url, headers=headers, data=data)
     if response.status_code == 200:
         return response.json()["access_token"]
     else:
-        print(f"Failed to get access token. Status code: {response.status_code}")
         return None
 
 
@@ -61,8 +60,6 @@ def get_hotels_with_pricing(city_code, check_in_date, check_out_date):
         response = requests.get(url, headers=headers, params=params)
 
         if response.status_code != 200:
-            print(f"Error fetching hotel data. Status code: {response.status_code}")
-            print(f"Response content: {response.content}")
             return []
 
         hotels = response.json().get("data", [])
@@ -84,7 +81,6 @@ def get_hotels_with_pricing(city_code, check_in_date, check_out_date):
 
         return hotel_data
     except Exception as e:
-        print(f"Error during request: {e}")
         return []
 
 def extract_dates_from_dataframe(dataframe):
@@ -107,38 +103,36 @@ def extract_city_from_dataframe(dataframe):
 
 # Function to parse and print hotel output (similar to flights)
 def parse_lodging_output(current_output, description):
+    error = False
     dataframe, rationale = parse_llm_output_lodging(current_output)
     print(rationale)
 
     city_code = extract_city_from_dataframe(dataframe)
-    if not  city_code:
-        print(current_output)
-        return
+    if not city_code:
+        error = True
 
     arrival_date, departure_date = extract_dates_from_dataframe(dataframe)
     if not arrival_date or not departure_date:
-        print(current_output)
-        return
+        error = True
 
     real_time_hotels = get_hotels_with_pricing(city_code, arrival_date, departure_date)
-    if len(real_time_hotels) != 0:
+    if len(real_time_hotels) != 0 and error == False:
         dataframe = pd.DataFrame(real_time_hotels)
-    else:
-        print(current_output)
-        return
 
     print("\nHotel Suggestions:\n")
+
     plan = ""
     for _, row in dataframe.iterrows():
         hotel_details = (
-            "Hotel: " + row['hotel_name'] + f" ({city_code})" + "\n"
-            "Arrival Date: " + arrival_date + "\n"
-            "Departure Date: " + departure_date + "\n"
-            "Price per night: $" + "{:.2f}".format(
-            row['hotel_price']) + "\n"
+                "Hotel: " + row['hotel_name'] + f" ({city_code})\n" +
+                "Arrival Date: " + arrival_date + "\n" +
+                "Departure Date: " + departure_date + "\n" +
+                "Price per night: $" + "{:.2f}".format(row['price_per_night']) + "\n"
         )
-
         print(hotel_details)
         plan += hotel_details
+
+
+
 
     return plan

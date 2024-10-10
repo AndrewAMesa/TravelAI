@@ -25,15 +25,12 @@ async def geocode_address(address, retries=3):
             except Exception as e:
                 if "429" in str(e):
                     # Handle rate limit (HTTP 429)
-                    wait_time = 2 ** i  # Exponential backoff
-                    print(f"Rate limit hit, retrying in {wait_time} seconds...")
+                    wait_time = 2 ** i
                     await asyncio.sleep(wait_time)
                 else:
                     # Handle other exceptions
-                    print(f"Error geocoding {address}: {e}")
                     return None
         # If retries are exhausted, return None
-        print(f"Failed to geocode {address} after {retries} retries.")
         return None
 
 async def ageocode_addresses(addresses):

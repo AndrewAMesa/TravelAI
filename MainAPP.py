@@ -31,9 +31,8 @@ def run_trip_planner(loggedUser, description, greeting):
                 current_output += output
 
             plan = parse_plan_output(current_output, description)
-        except Exception as e:
+        except Exception:
             # Cannot generate output locally that breaks it up into days, too resource intensive and not possible
-            print(f"API failed with error: {e}, falling back to local model.")
             plan = get_trip_planning_suggestions_local(description)
 
         if loggedUser != "None":
@@ -59,9 +58,8 @@ def run_flight_planner(loggedUser, description, greeting):
                 current_output += output
 
             plan = parse_flight_output(current_output, description)
-        except Exception as e:
+        except Exception:
             # Cannot generate output locally that breaks it up into days, too resource intensive and not possible
-            print(f"API failed with error: {e}, falling back to local model.")
             plan = get_flight_planning_suggestions_local(description)
 
         if loggedUser != "None":
@@ -88,9 +86,8 @@ def run_lodging_planner(loggedUser, description, greeting):
 
             # Parse the LLM output for hotel details
             plan = parse_lodging_output(current_output, description)
-        except Exception as e:
+        except Exception:
             # In case of API failure, fall back to local suggestion generation
-            print(f"API failed with error: {e}, falling back to local model.")
             plan = get_lodging_planning_suggestions_local(description)
 
         if loggedUser != "None":
@@ -118,9 +115,8 @@ def run_generic_planner(loggedUser, description, greeting):
             print (current_output)
             # Parse the LLM output for hotel details
             plan = current_output
-        except Exception as e:
+        except Exception:
             # In case of API failure, fall back to local suggestion generation
-            print(f"API failed with error: {e}, falling back to local model.")
             plan = get_generic_planning_suggestions_local(description)
 
         if loggedUser != "None":

@@ -40,7 +40,6 @@ def get_access_token():
     if response.status_code == 200:
         return response.json()["access_token"]
     else:
-        print(f"Failed to get access token. Status code: {response.status_code}")
         print(response.text)
         return None
 
@@ -49,7 +48,6 @@ def get_real_time_flights(departure_city, arrival_city, departure_date):
     api_key = get_access_token()
 
     if not api_key:
-        print("Error: Unable to fetch access token")
         return []
 
     url = "https://test.api.amadeus.com/v2/shopping/flight-offers"
@@ -77,8 +75,6 @@ def get_real_time_flights(departure_city, arrival_city, departure_date):
     response = requests.post(url, headers=headers, json=data)  # Note: POST request
 
     if response.status_code != 200:
-        print(f"Error fetching flight data. Status code: {response.status_code}")
-        print(f"Response content: {response.content}")
         return []
 
     flights = response.json().get("data", [])
