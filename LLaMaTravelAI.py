@@ -1,26 +1,16 @@
-import asyncio
 from huggingface_hub import InferenceClient
-from geopy.geocoders import Nominatim
-from geopy.adapters import AioHTTPAdapter
-from geopy.exc import GeocoderQuotaExceeded
-from ast import literal_eval
-import pandas as pd
-import numpy as np
-import time
-import re
 import os
 from dotenv import load_dotenv
 
 load_dotenv()
-
 hf_token = os.getenv("API_KEY")
 
 # Hugging Face API setup for LLM
 repo_id = "meta-llama/Meta-Llama-3-70B-Instruct"
 llm_client = InferenceClient(model=repo_id, timeout=180, token=hf_token)
 
-# Function to generate key points using the LLM
-def generate_key_points(text):
+# Prompt to generate an itinerary
+def generate_key_itinerary_points(text):
     prompt = f"""             
     Generate a set of key geographical points for the following description: {text}, as a json list with the number dictionaries matching the number of requested days, if
     no time is suggested make one make a dictionary with less then 10. Dictionary must include the following keys: 'name', 'description'.
@@ -35,71 +25,22 @@ def generate_key_points(text):
 
     return llm_client.text_generation(prompt, max_new_tokens=5000, stream=True, stop_sequences=["I hope that helps!"])
 
+# Prompt to generate a list of flights
+def generate_key_airplane_points(text):
+    prompt = f"""                       
+    Based on the following trip description: {text}, generate a list of direct flights (no layovers) as a JSON array, where each object represents one flight. 
+    Each flight must contain the following information:
+    - The 'departure_city' and 'arrival_city', both specified as "City, Country" format, and the corresponding IATA airport codes in parentheses.
+      For example, "departure_city": "Los Angeles, USA (LAX)", "arrival_city": "Paris, France (CDG)".
+    - The 'departure_date' in 'YYYY-MM-DD' format. If no date is provided in the description, use the January 15th, 2025.
+    - The 'departure_time' and 'arrival_time', represented in 24-hour format, like "14:30" for 2:30 PM.
+    - The 'airline' operating the flight, represented by its full name (e.g., "Delta Air Lines").
+    - The 'flight_price' in USD as a numeric value without commas or currency symbols (e.g., 350.00).
+    Only generate two sections: 'Thought:' provides your rationale for generating the points, then you list the locations in 'Flight suggestions:'. Then generate 'I hope that helps!' 
+    to indicate the end of the response.
+    Now begin.
+    Description: {text}
+    Thought:
+    """
+    return llm_client.text_generation(prompt, max_new_tokens=5000, stream=True, stop_sequences=["I hope that helps!"])
 
-# Function to parse the output from the LLM
-def parse_llm_output(output):
-    rationale = "Thought: " + output.split("Key points:")[0]
-    key_points = output.split("Key points:")[1]
-    output = key_points.replace("    ", "").replace("I hope that helps!", "").strip()
-    parsed_output = literal_eval(output)
-    dataframe = pd.DataFrame.from_dict(parsed_output)
-    return dataframe, rationale
-
-
-# Geocoding function to get coordinates
-async def geocode_address(address):
-    geolocator = Nominatim(user_agent="HF-trip-planner", adapter_factory=AioHTTPAdapter)
-    location = await geolocator.geocode(address, timeout=10)
-    if location:
-        return {'lat': location.latitude, 'lon': location.longitude}
-    return None
-
-
-# Updated function to ensure the event loop and client sessions are handled properly
-async def ageocode_addresses(addresses):
-    locations = []
-    async with Nominatim(user_agent="HF-trip-planner", adapter_factory=AioHTTPAdapter) as geolocator:
-        for address in addresses:
-            try:
-                location = await geolocator.geocode(address, timeout=10)
-                if location:
-                    locations.append({'lat': location.latitude, 'lon': location.longitude})
-                else:
-                    locations.append(None)
-            except GeocoderQuotaExceeded as e:
-                print(f"Rate limit reached. Retrying in 2 minutes...")
-                time.sleep(120)  # Wait for 2 minutes and try again
-                location = await geolocator.geocode(address, timeout=10)
-                if location:
-                    locations.append({'lat': location.latitude, 'lon': location.longitude})
-                else:
-                    locations.append(None)
-    return locations
-
-def geocode_addresses(addresses):
-    return asyncio.run(ageocode_addresses(addresses))
-
-def extract_num_days_from_prompt(description):
-    match = re.search(r'(\d+)\s*(day|days|week|weeks)', description.lower())
-    if match:
-        number = int(match.group(1))
-        unit = match.group(2)
-        if 'day' in unit:
-            return number
-        elif 'week' in unit or 'weekly' in unit:
-            return number * 7
-    else:
-        while True:
-            try:
-                num_days = int(input("How many days is your trip? "))
-                if num_days <= 0:
-                    raise ValueError("Please enter a positive number.")
-                break
-            except ValueError as e:
-                print(f"Invalid input: {e}. Please enter a valid number of days.")
-        return num_days
-
-def split_trip_into_days(dataframe, num_days):
-    day_splits = np.array_split(dataframe.index, num_days)
-    days = {f"Day {i + 1}": dataframe.loc[split] for i, split in enumerate(day_splits)}
-    return days
