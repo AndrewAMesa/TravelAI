@@ -124,10 +124,10 @@ def parse_lodging_output(current_output, description):
     plan = ""
     for _, row in dataframe.iterrows():
         hotel_details = (
-                "Hotel: " + row['hotel_name'] + f" ({city_code})\n" +
-                "Arrival Date: " + arrival_date + "\n" +
-                "Departure Date: " + departure_date + "\n" +
-                "Price per night: $" + "{:.2f}".format(row['price_per_night']) + "\n"
+                "Hotel: " + row['hotel_name'] + "\n" +
+                "- Arrival Date: " + arrival_date + "\n" +
+                "- Departure Date: " + departure_date + "\n" +
+                "- Price per night: $" + "{:.2f}".format(row['price_per_night']) + "\n"
         )
         print(hotel_details)
         plan += hotel_details
