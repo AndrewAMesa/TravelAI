@@ -44,3 +44,20 @@ def generate_key_airplane_points(text):
     """
     return llm_client.text_generation(prompt, max_new_tokens=5000, stream=True, stop_sequences=["I hope that helps!"])
 
+# Prompt to generate a list of hotels in a city
+def generate_key_hotel_points(text):
+    prompt = f"""                       
+    Based on the following trip description: {text}, generate a list of hotels in the city described in the trip. The output should be formatted as a JSON array, 
+    where each object represents one hotel. 
+    Each hotel must contain the following information:
+    - The 'hotel_name' and the corresponding IATA city code in parentheses.
+    - The 'arrival_date' in 'YYYY-MM-DD' format. If no date is provided in the description, use the January 15th, 2025.
+    - The 'departure_date' in 'YYYY-MM-DD' format. If no date is provided in the description, use the January 20th, 2025.
+    - The 'price_per_night' in USD as a numeric value without commas or currency symbols (e.g., 150.00).
+    Only generate two sections: 'Thought:' where you explain your rationale for choosing the hotels, and then list the hotels in 'Hotel suggestions:'. 
+    Conclude with 'I hope that helps!' to indicate the end of the response.
+    Now begin.
+    Description: {text}
+    Thought:
+    """
+    return llm_client.text_generation(prompt, max_new_tokens=5000, stream=True, stop_sequences=["I hope that helps!"])

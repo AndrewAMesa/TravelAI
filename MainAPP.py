@@ -5,6 +5,7 @@ from FlightPlanner import *
 from ItineraryPlanner import *
 from LLaMaTravelAI import *
 from PhiLocalAI import *
+from LodgingPlanner import *
 
 def run_trip_planner(loggedUser, description, greeting):
     if greeting:
@@ -59,6 +60,32 @@ def run_flight_planner(loggedUser, description, greeting):
         if loggedUser != "None":
             postHistory(user_login=loggedUser, title_message=description, ai_response=plan)
 
+def run_lodging_planner(loggedUser, description, greeting):
+    current_output = ""
+    if greeting:
+        for output in generateGreeting(description):
+            current_output += output
+        print(current_output)
+        if loggedUser != "None":
+            postHistory(user_login=loggedUser, title_message=description, ai_response=current_output)
+
+    else:
+        print(f"Generating hotel plan for: {description}\n")
+
+        try:
+            # Generate key hotel points using the LLM
+            for output in generate_key_hotel_points(description):
+                current_output += output
+
+            # Parse the LLM output for hotel details
+            plan = parse_lodging_output(current_output, description)
+        except Exception as e:
+            # In case of API failure, fall back to local suggestion generation
+            print(f"API failed with error: {e}, falling back to local model.")
+            plan = get_trip_planning_suggestions_local(description)
+
+        if loggedUser != "None":
+            postHistory(user_login=loggedUser, title_message=description, ai_response=plan)
 
 # Example command-line interface loop
 def main():
@@ -108,7 +135,7 @@ def main():
             if description.lower() == "exit":
                 print("\n Hope you have a good trip!")
                 break
-            run_flight_planner(loggedUser="None", description=description, greeting=greeting_check(greeting_problem))
+            run_lodging_planner(loggedUser="None", description=description, greeting=greeting_check(greeting_problem))
     else:
         print("Invalid choice. Please try again.")
         exit()
