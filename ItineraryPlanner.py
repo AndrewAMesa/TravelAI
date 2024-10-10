@@ -14,11 +14,26 @@ def parse_llm_output_itinerary(output):
     dataframe = pd.DataFrame.from_dict(parsed_output)
     return dataframe, rationale
 
-async def geocode_address(address):
+async def geocode_address(address, retries=3):
     async with Nominatim(user_agent="Custom-Trip-Planner-1.0", adapter_factory=AioHTTPAdapter) as geolocator:
-        location = await geolocator.geocode(address, timeout=10)
-        if location:
-            return {'lat': location.latitude, 'lon': location.longitude}
+        for i in range(retries):
+            try:
+                location = await geolocator.geocode(address, timeout=10)
+                if location:
+                    return {'lat': location.latitude, 'lon': location.longitude}
+                return None
+            except Exception as e:
+                if "429" in str(e):
+                    # Handle rate limit (HTTP 429)
+                    wait_time = 2 ** i  # Exponential backoff
+                    print(f"Rate limit hit, retrying in {wait_time} seconds...")
+                    await asyncio.sleep(wait_time)
+                else:
+                    # Handle other exceptions
+                    print(f"Error geocoding {address}: {e}")
+                    return None
+        # If retries are exhausted, return None
+        print(f"Failed to geocode {address} after {retries} retries.")
         return None
 
 async def ageocode_addresses(addresses):
