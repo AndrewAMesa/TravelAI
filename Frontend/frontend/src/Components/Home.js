@@ -10,12 +10,19 @@ const Home = () => {
     const [messages, setMessages] = useState([]); //for messages
     const [input, setInput] = useState(''); //for user input
     const [loggedUser, setLoggedUser] = useState('YourUsername');
+    const [chatHistory, setChatHistory] = useState([]);
 
     //function for user input
     const handleSendMessage = async () => {
       if (input.trim() !== '') {
         // Add user input
-        setMessages([...messages, { type: 'user', content: input }]);
+        const userMessage = {type: 'user', content: input}
+        setMessages([...messages, userMessage]);
+
+        //set Chat History
+        const newChatHistory = { title: input, date: new Date().toLocaleString() };
+        setChatHistory((prevHistory) => [...prevHistory, newChatHistory]);
+
         setInput('');
 
         // Call the Flask API
@@ -47,8 +54,24 @@ const Home = () => {
             { type: 'ai', content: 'Error communicating with the server.' },
           ]);
         }
-    }
-};
+      }
+    };
+
+    const handleChatClick = (chat) => {
+      {/* Doesnt clear yet */}
+      setMessages([]);
+
+      const userMessage = { type: 'user', content: chat.title }; // Use the title as the user's message
+      setMessages([...messages, userMessage]); // Add the clicked chat to the messages
+
+      // Optionally, if you want to simulate an AI response for the clicked chat
+      setTimeout(() => {
+        setMessages((prevMessages) => [
+          ...prevMessages,
+          { type: 'ai', content: 'This is a simulated AI response for the clicked chat.' }
+        ]);
+      }, 1000);
+    };
 
     return (
         <div className="h-screen flex flex-col">
@@ -58,7 +81,7 @@ const Home = () => {
           <div className="flex flex-1 overflow-hidden">
             {/* Sidebar Section */}
             <div className="w-1/4 bg-[#563635] text-white p-5">
-              <Sidebar />
+              <Sidebar chatHistory={chatHistory} onChatClick={handleChatClick} />
             </div>
     
             {/* Main Content Section */}
