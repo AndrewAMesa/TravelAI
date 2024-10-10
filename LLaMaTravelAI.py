@@ -45,7 +45,7 @@ def generate_key_airplane_points(text):
     return llm_client.text_generation(prompt, max_new_tokens=5000, stream=True, stop_sequences=["I hope that helps!"])
 
 # Prompt to generate a list of hotels in a city
-def generate_key_hotel_points(text):
+def generate_key_lodging_points(text):
     prompt = f"""                       
     Based on the following trip description: {text}, generate a list of hotels in the city described in the trip. The output should be formatted as a JSON array, 
     where each object represents one hotel. 
@@ -56,6 +56,24 @@ def generate_key_hotel_points(text):
     - The 'price_per_night' in USD as a numeric value without commas or currency symbols (e.g., 150.00).
     Only generate two sections: 'Thought:' where you explain your rationale for choosing the hotels, and then list the hotels in 'Hotel suggestions:'. 
     Conclude with 'I hope that helps!' to indicate the end of the response.
+    Now begin.
+    Description: {text}
+    Thought:
+    """
+    return llm_client.text_generation(prompt, max_new_tokens=5000, stream=True, stop_sequences=["I hope that helps!"])
+
+# Prompt to generate a list of hotels in a city
+def generate_generic_travel_prompt(text):
+    prompt = f"""
+    You are an expert travel assistant. Based on the following inquiry: "{text}", provide a detailed response with relevant travel information. The response should address the following:
+    1. **Context**: Explain the rationale behind your suggestions or answers based on the given query.
+    2. **Recommendations**: Offer detailed recommendations such as:
+       - If the user is asking about accommodations, suggest a list of hotels, resorts, or hostels with prices, locations, and descriptions.
+       - If the user is asking about activities or attractions, provide suggestions based on the location or interests described, along with practical information (e.g., opening hours, costs, or best times to visit).
+       - If the user is asking about transportation, recommend options such as flights, trains, or local transit routes with schedules and costs.
+       - If the user asks for an itinerary, provide a well-structured travel plan with suggested activities, accommodations, and transportation options.
+    Include only factual and up-to-date information, and format the output in a clear and concise manner, with bullet points or short paragraphs as needed. 
+    End the response with "I hope that helps!" to signify the completion.
     Now begin.
     Description: {text}
     Thought:

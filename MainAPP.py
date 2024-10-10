@@ -62,7 +62,7 @@ def run_flight_planner(loggedUser, description, greeting):
         except Exception as e:
             # Cannot generate output locally that breaks it up into days, too resource intensive and not possible
             print(f"API failed with error: {e}, falling back to local model.")
-            plan = get_trip_planning_suggestions_local(description)
+            plan = get_flight_planning_suggestions_local(description)
 
         if loggedUser != "None":
             postHistory(user_login=loggedUser, title_message=description, ai_response=plan)
@@ -83,7 +83,7 @@ def run_lodging_planner(loggedUser, description, greeting):
 
         try:
             # Generate key hotel points using the LLM
-            for output in generate_key_hotel_points(description):
+            for output in generate_key_lodging_points(description):
                 current_output += output
 
             # Parse the LLM output for hotel details
@@ -91,7 +91,37 @@ def run_lodging_planner(loggedUser, description, greeting):
         except Exception as e:
             # In case of API failure, fall back to local suggestion generation
             print(f"API failed with error: {e}, falling back to local model.")
-            plan = get_trip_planning_suggestions_local(description)
+            plan = get_lodging_planning_suggestions_local(description)
+
+        if loggedUser != "None":
+            postHistory(user_login=loggedUser, title_message=description, ai_response=plan)
+
+        return plan
+
+def run_generic_planner(loggedUser, description, greeting):
+    current_output = ""
+    if greeting:
+        for output in generateGreeting(description):
+            current_output += output
+        print(current_output)
+        if loggedUser != "None":
+            postHistory(user_login=loggedUser, title_message=description, ai_response=current_output)
+
+    else:
+        print(f"Generating feedback: {description}\n")
+
+        try:
+            # Generate key hotel points using the LLM
+            for output in generate_generic_travel_prompt(description):
+                current_output += output
+
+            print (current_output)
+            # Parse the LLM output for hotel details
+            plan = current_output
+        except Exception as e:
+            # In case of API failure, fall back to local suggestion generation
+            print(f"API failed with error: {e}, falling back to local model.")
+            plan = get_generic_planning_suggestions_local(description)
 
         if loggedUser != "None":
             postHistory(user_login=loggedUser, title_message=description, ai_response=plan)
@@ -157,16 +187,14 @@ def main():
                 print(f"Welcome, {loggedUser}")
 
         elif choice == "3":
-            print(f"Welcome")
-
-
+            print("Welcome")
 
         else:
             print("Invalid choice. Please try again.")
             exit()
 
         while True:
-            plan_type = input("Would you like to create an itinerary (1), find flights (2), or find hotels (3)?\n")
+            plan_type = input("Would you like to create an itinerary (1), find flights (2), find lodging (3), or generic inquiry (4)?\n")
             if plan_type == "1":
                 print("\nEnter a trip description:")
                 description = input("> ").strip()
@@ -182,19 +210,25 @@ def main():
                 greeting_problem = TextParsingProblem(initial=initial_state, grammar=greeting_grammer, goal='S')
                 run_flight_planner(loggedUser="None", description=description,greeting=greeting_check(greeting_problem))
             elif plan_type == "3":
-                print("\nEnter what city you want to find hotels:")
+                print("\nEnter what city you want to find lodging:")
                 description = input("> ").strip()
 
                 initial_state = description.lower().split()
                 greeting_problem = TextParsingProblem(initial=initial_state, grammar=greeting_grammer, goal='S')
                 run_lodging_planner(loggedUser="None", description=description,greeting=greeting_check(greeting_problem))
+            elif plan_type == "4":
+                print("\nEnter any travel related questions:")
+                description = input("> ").strip()
+
+                initial_state = description.lower().split()
+                greeting_problem = TextParsingProblem(initial=initial_state, grammar=greeting_grammer, goal='S')
+                run_generic_planner(loggedUser="None", description=description,greeting=greeting_check(greeting_problem))
 
             print("Do you want to exit (Y/N): ")
             description = input("> ").strip()
             if description.lower() == "y":
                 print("\n Hope you have a good trip!")
                 break
-
 
     # flask interface
     elif choice == "2":
