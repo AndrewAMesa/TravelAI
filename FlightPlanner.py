@@ -40,7 +40,6 @@ def get_access_token():
     if response.status_code == 200:
         return response.json()["access_token"]
     else:
-        print(response.text)
         return None
 
 
@@ -128,22 +127,19 @@ def parse_flight_output(current_output, description):
     dataframe, rationale = parse_llm_output_flight(current_output)
     print(rationale)
 
+    error = False
     departure_city, arrival_city = extract_cities_from_dataframe(dataframe)
     if not departure_city or not arrival_city:
-        print(current_output)
-        return
+        error = True
 
     departure_date = extract_date_from_dataframe(dataframe)
     if not departure_date:
-        print(current_output)
-        return
+        error = True
 
     real_time_flights = get_real_time_flights(departure_city, arrival_city, departure_date)
-    if len(real_time_flights) != 0:
+    if len(real_time_flights) != 0 and error == False:
         dataframe = pd.DataFrame(real_time_flights)
-    else:
-        print(current_output)
-        return
+
 
     print("\nFlight Suggestions (Direct Flights Only):\n")
     plan = ""
