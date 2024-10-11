@@ -20,6 +20,7 @@ def run_trip_planner(loggedUser, description, greeting):
             current_output += output
         print(current_output)
         postHistory(user_login=loggedUser, title_message=description, ai_response=current_output)
+        return current_output
 
     else:
         print(f"Generating trip plan for: {description}\n")
@@ -48,6 +49,7 @@ def run_flight_planner(loggedUser, description, greeting):
         print(current_output)
         if loggedUser != "None":
             postHistory(user_login=loggedUser, title_message=description, ai_response=current_output)
+            return current_output
 
     else:
         print(f"Generating flight plan for: {description}\n")
@@ -75,6 +77,7 @@ def run_lodging_planner(loggedUser, description, greeting):
         print(current_output)
         if loggedUser != "None":
             postHistory(user_login=loggedUser, title_message=description, ai_response=current_output)
+        return current_output
 
     else:
         print(f"Generating hotel plan for: {description}\n")
@@ -103,6 +106,7 @@ def run_generic_planner(loggedUser, description, greeting):
         print(current_output)
         if loggedUser != "None":
             postHistory(user_login=loggedUser, title_message=description, ai_response=current_output)
+        return current_output
 
     else:
         print(f"Generating feedback: {description}\n")
@@ -121,7 +125,6 @@ def run_generic_planner(loggedUser, description, greeting):
 
         if loggedUser != "None":
             postHistory(user_login=loggedUser, title_message=description, ai_response=plan)
-
         return plan
 
 
@@ -141,7 +144,6 @@ def trip_planner():
         initial_state = description.lower().split()
         greeting_problem = TextParsingProblem(initial=initial_state, grammar=greeting_grammer, goal='S')
         plan = run_generic_planner(loggedUser=logged_user, description=description,greeting=greeting_check(greeting_problem))
-        print(plan)
         return jsonify({'plan': plan}), 200
     except Exception as e:
         return jsonify({'error': str(e)}), 500
@@ -162,7 +164,6 @@ def itinerary_planner():
         initial_state = description.lower().split()
         greeting_problem = TextParsingProblem(initial=initial_state, grammar=greeting_grammer, goal='S')
         plan = run_trip_planner(loggedUser=logged_user, description=description,greeting=greeting_check(greeting_problem))
-        print(plan)
         return jsonify({'plan': plan}), 200
     except Exception as e:
         return jsonify({'error': str(e)}), 500
@@ -183,7 +184,6 @@ def flight_planner():
         initial_state = description.lower().split()
         greeting_problem = TextParsingProblem(initial=initial_state, grammar=greeting_grammer, goal='S')
         plan = run_flight_planner(loggedUser=logged_user, description=description,greeting=greeting_check(greeting_problem))
-        print(plan)
         return jsonify({'plan': plan}), 200
     except Exception as e:
         return jsonify({'error': str(e)}), 500
