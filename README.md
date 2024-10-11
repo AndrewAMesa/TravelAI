@@ -31,6 +31,15 @@ Note. If you don't want to use the local model comment out **from llama_cpp impo
       - API_KEY="your key"
       - FLIGHT_KEY="your key"
       - FLIGHT_SECRET="your secret"
+     
+## Creating the Database (for command-line use)
+1. Install PostgreSQL
+2. Create a new server
+3. Name: local
+4. Hostname: localhost
+5. Port: 5432
+6. Username: postgres
+
 
 ## Necessary Imports
 You may have to install some python libraries for this code to work: those could include
