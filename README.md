@@ -37,6 +37,7 @@ You may have to install some python libraries for this code to work: those could
 1. pip install llama-cpp-python
 2. pip install huggingface_hub
 3. pip install react
-4. pip install pandas
-5. pip install flask
-6. pip install geopy
+4. pip install react-cors
+5. pip install pandas
+6. pip install flask
+7. pip install geopy
