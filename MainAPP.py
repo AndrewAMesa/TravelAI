@@ -131,14 +131,84 @@ def trip_planner():
     logged_user = data.get('loggedUser')
     description = data.get('description')
 
-    if not logged_user or not description:
-        return jsonify({'error': 'Missing loggedUser or description'}), 400
+    if not description:
+        return jsonify({'error': 'Missing description'}), 400
+
+    if not logged_user:
+        logged_user = "None"
 
     try:
-        plan = run_trip_planner(loggedUser=logged_user, description=description)
+        initial_state = description.lower().split()
+        greeting_problem = TextParsingProblem(initial=initial_state, grammar=greeting_grammer, goal='S')
+        plan = run_generic_planner(loggedUser=logged_user, description=description,greeting=greeting_check(greeting_problem))
+        print(plan)
         return jsonify({'plan': plan}), 200
     except Exception as e:
         return jsonify({'error': str(e)}), 500
+
+@app.route('/run_itinerary_planner', methods=['POST'])
+def itinerary_planner():
+    data = request.json
+    logged_user = data.get('loggedUser')
+    description = data.get('description')
+
+    if not description:
+        return jsonify({'error': 'Missing description'}), 400
+
+    if not logged_user:
+        logged_user = "None"
+
+    try:
+        initial_state = description.lower().split()
+        greeting_problem = TextParsingProblem(initial=initial_state, grammar=greeting_grammer, goal='S')
+        plan = run_trip_planner(loggedUser=logged_user, description=description,greeting=greeting_check(greeting_problem))
+        print(plan)
+        return jsonify({'plan': plan}), 200
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+@app.route('/run_flight_planner', methods=['POST'])
+def flight_planner():
+    data = request.json
+    logged_user = data.get('loggedUser')
+    description = data.get('description')
+
+    if not description:
+        return jsonify({'error': 'Missing description'}), 400
+
+    if not logged_user:
+        logged_user = "None"
+
+    try:
+        initial_state = description.lower().split()
+        greeting_problem = TextParsingProblem(initial=initial_state, grammar=greeting_grammer, goal='S')
+        plan = run_flight_planner(loggedUser=logged_user, description=description,greeting=greeting_check(greeting_problem))
+        print(plan)
+        return jsonify({'plan': plan}), 200
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+@app.route('/run_lodging_planner', methods=['POST'])
+def lodging_planner():
+    data = request.json
+    logged_user = data.get('loggedUser')
+    description = data.get('description')
+
+    if not description:
+        return jsonify({'error': 'Missing description'}), 400
+
+    if not logged_user:
+        logged_user = "None"
+
+    try:
+        initial_state = description.lower().split()
+        greeting_problem = TextParsingProblem(initial=initial_state, grammar=greeting_grammer, goal='S')
+        plan = run_lodging_planner(loggedUser=logged_user, description=description,greeting=greeting_check(greeting_problem))
+        print(plan)
+        return jsonify({'plan': plan}), 200
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
 
 # Example command-line interface loop
 def main():
@@ -228,7 +298,7 @@ def main():
 
     # flask interface
     elif choice == "2":
-        app.run(debug=True)
+        app.run(debug=True, use_reloader=False)
 
 if __name__ == "__main__":
     main()
