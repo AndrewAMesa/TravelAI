@@ -1,7 +1,7 @@
 import copy
 from collections import defaultdict
 
-from LLaMaTravelAI import llm_client
+from Backend.Models.LLaMaTravelAI import *
 
 
 def is_in(elt, seq):

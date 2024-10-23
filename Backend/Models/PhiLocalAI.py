@@ -28,7 +28,7 @@ def get_trip_planning_suggestions_local(text):
 def get_flight_planning_suggestions_local(text):
 
     # Load the GGUF model (Using Phi)
-    llm = Llama(model_path="Phi-3-mini-4k-instruct-q4.gguf")
+    llm = Llama(model_path="../../Phi-3-mini-4k-instruct-q4.gguf")
 
     prompt = f"""
     Only create a list of flights from the departure city to arrival city in this text: "{text}".
@@ -51,7 +51,7 @@ def get_flight_planning_suggestions_local(text):
 def get_lodging_planning_suggestions_local(text):
 
     # Load the GGUF model (Using Phi)
-    llm = Llama(model_path="Phi-3-mini-4k-instruct-q4.gguf")
+    llm = Llama(model_path="../../Phi-3-mini-4k-instruct-q4.gguf")
 
     prompt = f"""
         Only create a list of hotels for the city "{text}".
@@ -74,7 +74,7 @@ def get_lodging_planning_suggestions_local(text):
 def get_generic_planning_suggestions_local(text):
 
     # Load the GGUF model (Using Phi)
-    llm = Llama(model_path="Phi-3-mini-4k-instruct-q4.gguf")
+    llm = Llama(model_path="../../Phi-3-mini-4k-instruct-q4.gguf")
 
     prompt = f"""
     You are an expert travel assistant. Based on the following inquiry: "{text}", provide a detailed response with relevant travel information.
