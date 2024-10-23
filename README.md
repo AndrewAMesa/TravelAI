@@ -27,7 +27,7 @@ An AI assistant to streamline travel planning. Use it to:
 1. Run `MainAPP.py` and select **option 2 (Flask server)**.  
 2. In a new terminal, navigate to the `Frontend` directory and start the React app:  
    ```bash
-   cd Frontend/frontend  
+   cd Frontend 
    npm start  
    ```  
 3. The React app will open on your device, allowing you to interact with the application.  
@@ -91,4 +91,8 @@ pip install react-cors
 pip install pandas  
 pip install flask  
 pip install geopy  
+```
+Before using the UI, inside the Frontend folder you may need to run:
+```bash
+npm install react-scripts
 ```
