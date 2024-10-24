@@ -76,18 +76,21 @@ const Home = () => {
               icon={flightIcon}
               onClick={() => handleMessage('run_flight_planner')}
               isSmall={buttonsShrink}
+              zIndex={1}
             />
             <ActionButton
               label="Find Lodging"
               icon={lodgingIcon}
               onClick={() => handleMessage('run_lodging_planner')}
               isSmall={buttonsShrink}
+              zIndex={1}
             />
             <ActionButton
               label="Itinerary Planning"
               icon={itineraryIcon}
               onClick={() => handleMessage('run_itinerary_planner')}
               isSmall={buttonsShrink}
+              zIndex={1}
             />
           </div>
 
@@ -107,7 +110,7 @@ const Home = () => {
                     : 'bg-[#563635] text-white'
                 }`}
                 style={{
-                  maxWidth: '70%', // Limits how wide the message box can get
+                  maxWidth: '70%',
                   alignSelf: message.type === 'user' ? 'flex-end' : 'flex-start',
                 }}
               >
@@ -119,20 +122,25 @@ const Home = () => {
 
           {/* Input Section */}
           <div className="w-full flex items-center bg-[#fadbca] shadow-2xl shadow-black p-2">
-            <input
-              type="text"
-              value={input}
-              onChange={(e) => setInput(e.target.value)}
-              placeholder="Search for flights, lodging, or destinations..."
-              className="p-2 bg-[#fadbca] w-full font-josefin text-[#563635] placeholder:text-[#563635] placeholder:text-opacity-60 mr-4"
-            />
-            <button
-              onClick={() => handleMessage('run_trip_planner')}
-              className="p-3 bg-[#563635] text-white font-josefin rounded-full"
-            >
-              Send
-            </button>
-          </div>
+          <input
+            type="text"
+            value={input}
+            onChange={(e) => setInput(e.target.value)}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter') {
+                handleMessage('run_trip_planner');
+              }
+            }}
+            placeholder="Search for flights, lodging, or destinations..."
+            className="p-2 bg-[#fadbca] w-full font-josefin text-[#563635] placeholder:text-[#563635] placeholder:text-opacity-60 mr-4"
+          />
+          <button
+            onClick={() => handleMessage('run_trip_planner')}
+            className="p-3 bg-[#563635] text-white font-josefin rounded-full"
+          >
+            Send
+          </button>
+        </div>
         </div>
       </div>
     </div>
